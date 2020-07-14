@@ -8,7 +8,8 @@ import shutil
 import datetime
 
 load_dotenv()
-SERVER = os.getenv('SERVER')
+SOURCE_SERVER = os.getenv('SOURCE-SERVER')
+REMOTE_SERVER = os.getenv('REMOTE-SERVER')
 PORT = os.getenv('PORT')
 SOURCE_USER = os.getenv('SOURCE-USER')
 REMOTE_USER = os.getenv('REMOTE-USER')
@@ -55,7 +56,7 @@ def main():
 
     clear_dirs(dir_path)
 
-    ssh = createSSHClient(SERVER, PORT, SOURCE_USER, PASSWORD)
+    ssh = createSSHClient(SOURCE_SERVER, PORT, SOURCE_USER, PASSWORD)
     scp = SCPClient( ssh.get_transport() )
 
     timestamp = str( datetime.date.today() )
