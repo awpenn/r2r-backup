@@ -15,13 +15,13 @@ KEY_FILENAME = os.getenv('KEY_FILENAME')
 
 
 
-def createSSHClient(server, port, user, password):
+def createSSHClient(server, port, user, password, key_filename):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(server, port, user, password, allow_agent=False,look_for_keys=False)
+    # client.connect(server, port, user, password, allow_agent=False,l ook_for_keys=False)
     client.connect(server, port, user, password, key_filename)
     return client
 
-ssh = createSSHClient(SERVER, PORT, USER, PASSWORD, key_filename)
-scp = SCPClient(ssh.get_transport())
+ssh = createSSHClient(SERVER, PORT, USER, PASSWORD, KEY_FILENAME)
+# scp = SCPClient(ssh.get_transport())
