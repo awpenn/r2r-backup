@@ -8,18 +8,23 @@ import shutil
 import datetime
 
 load_dotenv()
-SOURCE_SERVER = os.getenv('SOURCE-SERVER')
-REMOTE_SERVER = os.getenv('REMOTE-SERVER')
-PORT = os.getenv('PORT')
-SOURCE_USER = os.getenv('SOURCE-USER')
-REMOTE_USER = os.getenv('REMOTE-USER')
-PASSWORD = os.getenv('PASSWORD')
+
 SOURCE_DIR = os.getenv('SOURCE-DIR')
+SOURCE_SERVER = os.getenv('SOURCE-SERVER')
+SOURCE_PORT = os.getenv('SOURCE-PORT')
+SOURCE_USER = os.getenv('SOURCE-USER')
+SOURCE_PASSWORD = os.getenv('SOURCE-PASSWORD')
+
 REMOTE_DIR = os.getenv('REMOTE-DIR')
-KEY_FILENAME = os.getenv('KEY_FILENAME')
+REMOTE_SERVER = os.getenv('REMOTE-SERVER')
+REMOTE_PORT = os.getenv('REMOTE-PORT')
+REMOTE_USER = os.getenv('REMOTE-USER')
+REMOTE_PASSWORD = os.getenv('REMOTE-PASSWORD')
 
 dir_path = os.path.dirname(os.path.realpath('./'))
+
 LOCAL_DIR = f"{dir_path}/r2r-backup/pulled-files"
+
 
 
 def createSSHClient(server, port, user, password):
@@ -51,12 +56,19 @@ def make_tarfile(output_filename, source_dir):
 
     print('tar file created...')
 
+def get_tarfile(dir_path):
+    files = os.listdir(f"{dir_path}/r2r-backup/output-files")
+    for file in files:
+        if file not in [".gitignore", "README.md"]:
+            tarname = file
+            return tarname
+
 def main():
     global dir_path
 
     clear_dirs(dir_path)
 
-    ssh = createSSHClient(SOURCE_SERVER, PORT, SOURCE_USER, PASSWORD)
+    ssh = createSSHClient(SOURCE_SERVER, SOURCE_PORT, SOURCE_USER, SOURCE_PASSWORD)
     scp = SCPClient( ssh.get_transport() )
 
     timestamp = str( datetime.date.today() )
@@ -66,6 +78,17 @@ def main():
     print('Files pulled from database server...')
 
     make_tarfile( f"{dir_path}/r2r-backup/output-files/{timestamp}-db-backup.tar.gz", LOCAL_DIR )
+
+    ssh = createSSHClient(REMOTE_SERVER, REMOTE_PORT, REMOTE_USER, REMOTE_PASSWORD)
+    scp = SCPClient( ssh.get_transport() )
+
+    timestamp = str( datetime.date.today() )
+
+    print('pushing files to remote server...')
+    tarname = get_tarfile(dir_apth)
+
+    scp.get('output_files', REMOTE_DIR)
+    print('Files pushed to remote server...')
 
 
 if __name__ == '__main__':
