@@ -68,27 +68,33 @@ def main():
 
     clear_dirs(dir_path)
 
+    ##setting up connection to source server
     ssh = createSSHClient(SOURCE_SERVER, SOURCE_PORT, SOURCE_USER, SOURCE_PASSWORD)
     scp = SCPClient( ssh.get_transport() )
 
     timestamp = str( datetime.date.today() )
 
-    print('Pulling files from db server...')
+    print('pulling files from db server...')
+    ## getting files from source server
     scp.get( SOURCE_DIR, LOCAL_DIR, recursive=True )
-    print('Files pulled from database server...')
+    print('files pulled from database server...')
 
+    ## building tar file from pulled dirs
     make_tarfile( f"{dir_path}/r2r-backup/output-files/{timestamp}-db-backup.tar.gz", LOCAL_DIR )
 
+    ## setting up connection to storage location
     ssh = createSSHClient(REMOTE_SERVER, REMOTE_PORT, REMOTE_USER, REMOTE_PASSWORD)
     scp = SCPClient( ssh.get_transport() )
 
     timestamp = str( datetime.date.today() )
 
+    ## getting name of tar file to send
     print('pushing files to remote server...')
-    tarname = get_tarfile(dir_apth)
+    tarname = get_tarfile(dir_path)
 
-    scp.get('output_files', REMOTE_DIR)
-    print('Files pushed to remote server...')
+    ## putting tar file in storage location
+    scp.put(f'{dir_path}/r2r-backup/output-files/{tarname}', REMOTE_DIR)
+    print('files pushed to remote server...')
 
 
 if __name__ == '__main__':
