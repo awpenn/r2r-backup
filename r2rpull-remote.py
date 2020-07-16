@@ -1,3 +1,5 @@
+## This code for two-machine process where script lives on "source server", creates tar and sends to remote storage
+
 import paramiko
 from scp import SCPClient
 from dotenv import load_dotenv
@@ -10,10 +12,6 @@ import datetime
 load_dotenv()
 
 SOURCE_DIR = os.getenv('SOURCE-DIR')
-SOURCE_SERVER = os.getenv('SOURCE-SERVER')
-SOURCE_PORT = os.getenv('SOURCE-PORT')
-SOURCE_USER = os.getenv('SOURCE-USER')
-SOURCE_PASSWORD = os.getenv('SOURCE-PASSWORD')
 
 REMOTE_DIR = os.getenv('REMOTE-DIR')
 REMOTE_SERVER = os.getenv('REMOTE-SERVER')
@@ -37,9 +35,13 @@ def createSSHClient(server, port, user, password):
     return client
 
 def clear_dirs(dir_path):
+    tindex = SOURCE_DIR.rindex('/')
+    ## name of target source folder
+    tail = SOURCE_DIR[tindex+1:]
+
     folders = os.listdir(f"{dir_path}/r2r-backup/pulled-files")
     for folder in folders:
-        if folder == 'bkps':
+        if folder == tail:
             shutil.rmtree(f"{dir_path}/r2r-backup/pulled-files/{folder}")
 
     files = os.listdir(f"{dir_path}/r2r-backup/output-files")
@@ -68,16 +70,16 @@ def main():
 
     clear_dirs(dir_path)
 
-    ##setting up connection to source server
-    ssh = createSSHClient(SOURCE_SERVER, SOURCE_PORT, SOURCE_USER, SOURCE_PASSWORD)
-    scp = SCPClient( ssh.get_transport() )
-
     timestamp = str( datetime.date.today() )
 
-    print('pulling files from db server...')
+    print('pulling files into r2r...')
     ## getting files from source server
-    scp.get( SOURCE_DIR, LOCAL_DIR, recursive=True )
-    print('files pulled from database server...')
+    
+    ## name of target source folder
+    tindex = SOURCE_DIR.rindex('/')
+    tail = SOURCE_DIR[tindex+1:]
+    shutil.copytree(SOURCE_DIR, f"{LOCAL_DIR}/{tail}")
+    print('files pulled into r2rr...')
 
     ## building tar file from pulled dirs
     make_tarfile( f"{dir_path}/r2r-backup/output-files/{timestamp}-db-backup.tar.gz", LOCAL_DIR )
@@ -91,11 +93,10 @@ def main():
     ## getting name of tar file to send
     print('pushing files to remote server...')
     tarname = get_tarfile(dir_path)
-
+    print(tarname)
     ## putting tar file in storage location
     scp.put(f'{dir_path}/r2r-backup/output-files/{tarname}', REMOTE_DIR)
     print('files pushed to remote server...')
-
 
 if __name__ == '__main__':
     main()

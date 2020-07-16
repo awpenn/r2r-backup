@@ -1,4 +1,5 @@
 .env
+.envsave
 .venv
 devnotes.md
 .DS_Store
