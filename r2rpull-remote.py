@@ -79,7 +79,7 @@ def main():
     tindex = SOURCE_DIR.rindex('/')
     tail = SOURCE_DIR[tindex+1:]
     shutil.copytree(SOURCE_DIR, f"{LOCAL_DIR}/{tail}")
-    print('files pulled into r2rr...')
+    print('files pulled into r2r...')
 
     ## building tar file from pulled dirs
     make_tarfile( f"{dir_path}/r2r-backup/output-files/{timestamp}-db-backup.tar.gz", LOCAL_DIR )
