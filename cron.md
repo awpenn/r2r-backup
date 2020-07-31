@@ -5,4 +5,4 @@
 
 #on database server
 # at 12:01am, first of every month, run archive script
-1 0 1 * * bash $PWD/run-backup.sh
+1 0 1 * * bash /home/r2r-backup/run-backup.sh

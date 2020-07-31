@@ -1,11 +1,9 @@
 #!/bin/bash
 
-CURDIR=${PWD} 
+cd /home/r2r-backup
 
-source $CURDIR/.venv/bin/activate
+source /home/r2r-backup/.venv/bin/activate
 
-python r2rpull-remote.py
+python /home/r2r-backup/r2rpull-remote.py
 
-deactivate 
-
-echo Archiving process has ended. Confirm backup present in sciget. 
+deactivate
