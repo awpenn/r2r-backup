@@ -3,3 +3,4 @@
 .venv
 devnotes.md
 .DS_Store
+.ssh

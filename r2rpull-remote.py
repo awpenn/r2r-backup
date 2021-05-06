@@ -13,9 +13,10 @@ load_dotenv()
 
 SOURCE_DIR = os.getenv('SOURCE-DIR')
 
+SOURCE_PRIVATEKEY = os.getenv('SOURCE-PRIVATEKEY')
+
 REMOTE_DIR = os.getenv('REMOTE-DIR')
 REMOTE_SERVER = os.getenv('REMOTE-SERVER')
-REMOTE_PORT = os.getenv('REMOTE-PORT')
 REMOTE_USER = os.getenv('REMOTE-USER')
 REMOTE_PASSWORD = os.getenv('REMOTE-PASSWORD')
 
@@ -23,14 +24,12 @@ dir_path = os.path.dirname(os.path.realpath('./'))
 
 LOCAL_DIR = f"{dir_path}/r2r-backup/pulled-files"
 
-
-
-def createSSHClient(server, port, user, password):
-    client = paramiko.SSHClient()
-    client.load_system_host_keys()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+def createSSHClient( server, user, key_filename ):
+    client = paramiko.SSHClient( )
+    client.load_system_host_keys( )
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy( ) )
     # client.connect(server, port, user, password, key_filename)
-    client.connect(hostname=server,username=user, password=password)
+    client.connect( hostname=server, password=None, username=user, key_filename=key_filename )
     
     return client
 
@@ -48,7 +47,6 @@ def clear_dirs(dir_path):
     for file in files:
         if file not in ['README.md', '.gitignore']:
             os.remove(f"{dir_path}/r2r-backup/output-files/{file}")
-
 
 def make_tarfile(output_filename, source_dir):
     print('building tar file...')
@@ -85,10 +83,10 @@ def main():
     make_tarfile( f"{dir_path}/r2r-backup/output-files/{timestamp}-db-backup.tar.gz", LOCAL_DIR )
 
     ## setting up connection to storage location
-    ssh = createSSHClient(REMOTE_SERVER, REMOTE_PORT, REMOTE_USER, REMOTE_PASSWORD)
-    scp = SCPClient( ssh.get_transport() )
+    ssh = createSSHClient( REMOTE_SERVER, REMOTE_USER, SOURCE_PRIVATEKEY )
+    scp = SCPClient( ssh.get_transport( ) )
 
-    timestamp = str( datetime.date.today() )
+    timestamp = str( datetime.date.today( ) )
 
     ## getting name of tar file to send
     print('pushing files to remote server...')
