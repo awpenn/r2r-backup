@@ -97,8 +97,12 @@ def main():
     tarname = get_tarfile(dir_path)
     print(tarname)
     ## putting tar file in storage location
-    scp.put(f'{dir_path}/r2r-backup/output-files/{tarname}', REMOTE_DIR)
-    print('files pushed to remote server...')
+
+    try:
+        scp.put(f'{dir_path}/r2r-backup/output-files/{tarname}', REMOTE_DI)
+        print('files pushed to remote server...')
+    except:
+        print('send alert email on fail')
 
 if __name__ == '__main__':
     main()
