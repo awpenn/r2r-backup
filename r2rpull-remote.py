@@ -9,6 +9,8 @@ import tarfile
 import shutil
 import datetime
 
+import send_alert
+
 load_dotenv()
 
 SOURCE_DIR = os.getenv('SOURCE-DIR')
@@ -99,10 +101,11 @@ def main():
     ## putting tar file in storage location
 
     try:
-        scp.put(f'{dir_path}/r2r-backup/output-files/{tarname}', REMOTE_DI)
+        scp.put(f'{dir_path}/r2r-backup/output-files/{tarname}', REMOTE_DIR)
         print('files pushed to remote server...')
     except:
-        print('send alert email on fail')
+        print( 'scp failed...sending email' )
+        send_alert.main( )
 
 if __name__ == '__main__':
     main()
