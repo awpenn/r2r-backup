@@ -40,8 +40,12 @@ def clear_dirs(dir_path):
 
     folders = os.listdir(f"{dir_path}/r2r-backup/pulled-files")
     for folder in folders:
-        if folder == tail:
-            shutil.rmtree(f"{dir_path}/r2r-backup/pulled-files/{folder}")
+        if folder  == '.DS_Store':
+            if folder not in ['README.md', '.gitignore']:
+                os.remove(f"{dir_path}/r2r-backup/pulled-files/{folder}")
+        else:
+            if folder not in ['README.md', '.gitignore']:
+                shutil.rmtree(f"{dir_path}/r2r-backup/pulled-files/{folder}")
 
     files = os.listdir(f"{dir_path}/r2r-backup/output-files")
     for file in files:
