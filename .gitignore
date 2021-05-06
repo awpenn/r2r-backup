@@ -4,3 +4,4 @@
 devnotes.md
 .DS_Store
 .ssh
+__pycache__/*
